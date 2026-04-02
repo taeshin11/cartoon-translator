@@ -8,6 +8,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { AdBanner, AdSocialBar } from "@/components/adsterra-ad";
 
 // ─── Feature data ────────────────────────────────────────────────────────────
 
@@ -285,6 +286,11 @@ export default function Home() {
         </section>
 
         {/* ── Features ─────────────────────────────────────────────────────── */}
+        {/* Ad Banner between sections */}
+        <div className="flex justify-center py-4">
+          <AdBanner />
+        </div>
+
         <section id="features" className="py-20 sm:py-28 bg-muted/30">
           <div className="mx-auto max-w-6xl px-6">
             <div className="text-center mb-14">
@@ -397,6 +403,9 @@ export default function Home() {
           </div>
         </section>
       </main>
+
+      {/* Adsterra Social Bar */}
+      <AdSocialBar />
 
       {/* ── Footer ───────────────────────────────────────────────────────────── */}
       <footer className="border-t border-border/60 bg-background py-8">

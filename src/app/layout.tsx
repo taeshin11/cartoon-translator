@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   title: "CartoonTranslator - AI Manga & Comic Translation | Free Online Tool",
   description:
     "Translate manga, comics, and webtoons instantly with AI-powered OCR. Supports Japanese vertical text, Korean, Chinese. Free online manga translator.",
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/icon-192.png",
+  },
   keywords: [
     "manga translator",
     "comic translation",
