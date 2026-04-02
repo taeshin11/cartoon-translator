@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Separator } from "@/components/ui/separator"
+import { VisitorCounter } from "@/components/visitor-counter"
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -44,14 +45,8 @@ export function Footer() {
             &copy; {currentYear} CartoonTranslator. All rights reserved.
           </p>
 
-          {/* Visitor counter placeholder */}
-          <p className="text-xs text-muted-foreground">
-            Today:{" "}
-            <span className="font-mono">--</span>
-            {" | "}
-            Total:{" "}
-            <span className="font-mono">--</span>
-          </p>
+          {/* Visitor counter */}
+          <VisitorCounter />
         </div>
       </div>
     </footer>

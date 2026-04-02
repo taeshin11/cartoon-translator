@@ -79,10 +79,10 @@ const steps = [
 // ─── Stats data ───────────────────────────────────────────────────────────────
 
 const stats = [
-  { value: "2M+", label: "Pages translated" },
+  { value: "20", label: "Pages per batch" },
   { value: "50+", label: "Languages supported" },
-  { value: "150K+", label: "Manga fans" },
-  { value: "99%", label: "OCR accuracy" },
+  { value: "Free", label: "No sign-up needed" },
+  { value: "95%+", label: "CJK OCR accuracy" },
 ];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
