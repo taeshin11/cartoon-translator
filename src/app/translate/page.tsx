@@ -37,10 +37,17 @@ const TARGET_LANGUAGES = [
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"]
 
+interface TranslationBlock {
+  original: string
+  translated: string
+  confidence: number
+}
+
 interface TranslationResult {
   success: boolean
   message: string
   imageUrl?: string
+  blocks?: TranslationBlock[]
 }
 
 export default function TranslatePage() {
@@ -358,6 +365,22 @@ export default function TranslatePage() {
                   alt="Translated result"
                   className="mx-auto max-h-96 w-auto rounded-lg object-contain shadow-sm"
                 />
+              </CardContent>
+            )}
+
+            {result.blocks && result.blocks.length > 0 && (
+              <CardContent>
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-foreground">Translation Details</h3>
+                  <div className="space-y-2">
+                    {result.blocks.map((block, i) => (
+                      <div key={i} className="rounded-lg border bg-muted/30 p-3 text-sm">
+                        <div className="text-muted-foreground line-through">{block.original}</div>
+                        <div className="mt-1 font-medium text-foreground">{block.translated}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </CardContent>
             )}
 
