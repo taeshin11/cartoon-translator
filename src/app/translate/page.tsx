@@ -23,6 +23,7 @@ import {
   Clock,
   Trash2,
   Columns2,
+  RefreshCw,
 } from "lucide-react"
 
 const SOURCE_LANGUAGES = [
@@ -32,6 +33,14 @@ const SOURCE_LANGUAGES = [
   { value: "zh", label: "Chinese (Simplified)" },
   { value: "zh-TW", label: "Chinese (Traditional)" },
   { value: "en", label: "English" },
+  { value: "es", label: "Spanish" },
+  { value: "fr", label: "French" },
+  { value: "de", label: "German" },
+  { value: "ru", label: "Russian" },
+  { value: "th", label: "Thai" },
+  { value: "vi", label: "Vietnamese" },
+  { value: "ar", label: "Arabic" },
+  { value: "hi", label: "Hindi" },
 ]
 
 const TARGET_LANGUAGES = [
@@ -43,16 +52,43 @@ const TARGET_LANGUAGES = [
   { value: "es", label: "Spanish" },
   { value: "fr", label: "French" },
   { value: "de", label: "German" },
+  { value: "pt", label: "Portuguese" },
+  { value: "pt-BR", label: "Portuguese (Brazil)" },
+  { value: "it", label: "Italian" },
+  { value: "ru", label: "Russian" },
+  { value: "ar", label: "Arabic" },
+  { value: "th", label: "Thai" },
+  { value: "vi", label: "Vietnamese" },
+  { value: "id", label: "Indonesian" },
+  { value: "ms", label: "Malay" },
+  { value: "tr", label: "Turkish" },
+  { value: "pl", label: "Polish" },
+  { value: "nl", label: "Dutch" },
+  { value: "sv", label: "Swedish" },
+  { value: "da", label: "Danish" },
+  { value: "no", label: "Norwegian" },
+  { value: "fi", label: "Finnish" },
+  { value: "hu", label: "Hungarian" },
+  { value: "cs", label: "Czech" },
+  { value: "ro", label: "Romanian" },
+  { value: "bg", label: "Bulgarian" },
+  { value: "hr", label: "Croatian" },
+  { value: "uk", label: "Ukrainian" },
+  { value: "hi", label: "Hindi" },
+  { value: "bn", label: "Bengali" },
+  { value: "tl", label: "Filipino" },
+  { value: "he", label: "Hebrew" },
+  { value: "el", label: "Greek" },
 ]
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024
-const MAX_FILES = 20
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"]
 
 interface TranslationBlock {
   original: string
   translated: string
   confidence: number
+  bbox?: number[][]
 }
 
 interface TranslationResult {
@@ -60,6 +96,8 @@ interface TranslationResult {
   message: string
   imageUrl?: string
   blocks?: TranslationBlock[]
+  limitReached?: boolean
+  usage?: { remaining: number; limit: number; isPro: boolean }
 }
 
 interface PageResult {
@@ -75,7 +113,6 @@ interface HistoryItem {
   sourceLang: string
   targetLang: string
   pageCount: number
-  thumbnail?: string
 }
 
 function loadHistory(): HistoryItem[] {
@@ -108,8 +145,11 @@ export default function TranslatePage() {
   const [activePageIndex, setActivePageIndex] = useState(0)
   const [editedBlocks, setEditedBlocks] = useState<Record<number, TranslationBlock[]>>({})
   const [history, setHistory] = useState<HistoryItem[]>([])
+  const [isRerendering, setIsRerendering] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const MAX_FILES = 20
 
   useEffect(() => {
     setHistory(loadHistory())
@@ -122,7 +162,9 @@ export default function TranslatePage() {
       const fileArray = Array.from(files)
 
       if (pages.length + fileArray.length > MAX_FILES) {
-        setFileError(`Maximum ${MAX_FILES} pages allowed. You have ${pages.length} already.`)
+        setFileError(
+          `Maximum ${MAX_FILES} pages allowed. You have ${pages.length} already.`
+        )
         return []
       }
 
@@ -139,7 +181,7 @@ export default function TranslatePage() {
       }
       return valid
     },
-    [pages.length]
+    [pages.length, MAX_FILES]
   )
 
   const addFiles = useCallback(
@@ -208,8 +250,7 @@ export default function TranslatePage() {
   )
 
   const translateSinglePage = async (
-    page: PageResult,
-    index: number
+    page: PageResult
   ): Promise<TranslationResult> => {
     const formData = new FormData()
     formData.append("image", page.file)
@@ -241,10 +282,9 @@ export default function TranslatePage() {
       setPages([...updatedPages])
 
       try {
-        const result = await translateSinglePage(updatedPages[i], i)
+        const result = await translateSinglePage(updatedPages[i])
         updatedPages[i] = { ...updatedPages[i], result, isProcessing: false }
 
-        // Initialize editable blocks
         if (result.blocks) {
           setEditedBlocks((prev) => ({ ...prev, [i]: [...result.blocks!] }))
         }
@@ -274,6 +314,7 @@ export default function TranslatePage() {
     setHistory(newHistory)
 
     setIsProcessing(false)
+    setOverallProgress(100)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pages, sourceLanguage, targetLanguage])
 
@@ -286,6 +327,53 @@ export default function TranslatePage() {
       })
     },
     []
+  )
+
+  const handleRerender = useCallback(
+    async (pageIndex: number) => {
+      const page = pages[pageIndex]
+      const blocks = editedBlocks[pageIndex]
+      if (!page || !blocks) return
+
+      setIsRerendering(true)
+      try {
+        const formData = new FormData()
+        formData.append("image", page.file)
+        formData.append(
+          "blocks",
+          JSON.stringify(
+            blocks
+              .filter((b) => b.bbox && b.bbox.length >= 4)
+              .map((b) => ({ translated: b.translated, bbox: b.bbox }))
+          )
+        )
+        formData.append("targetLang", targetLanguage)
+
+        const response = await fetch("/api/rerender", {
+          method: "POST",
+          body: formData,
+        })
+        const data = await response.json()
+
+        if (data.success && data.imageUrl) {
+          setPages((prev) => {
+            const updated = [...prev]
+            updated[pageIndex] = {
+              ...updated[pageIndex],
+              result: {
+                ...updated[pageIndex].result!,
+                imageUrl: data.imageUrl,
+              },
+            }
+            return updated
+          })
+        }
+      } catch {
+        // Silent fail
+      }
+      setIsRerendering(false)
+    },
+    [pages, editedBlocks, targetLanguage]
   )
 
   const handleReset = useCallback(() => {
@@ -424,7 +512,6 @@ export default function TranslatePage() {
                   aria-hidden="true"
                 />
 
-                {/* Thumbnails of uploaded pages */}
                 {pages.length > 0 && (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -467,6 +554,9 @@ export default function TranslatePage() {
             <Card>
               <CardHeader>
                 <CardTitle>Languages</CardTitle>
+                <CardDescription>
+                  {TARGET_LANGUAGES.length}+ target languages supported
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -528,6 +618,7 @@ export default function TranslatePage() {
                 </p>
               </div>
             )}
+
           </TabsContent>
 
           {/* ===== RESULTS TAB ===== */}
@@ -583,7 +674,7 @@ export default function TranslatePage() {
                   </div>
                 </div>
 
-                {/* Current page result */}
+                {/* Current page processing */}
                 {currentPage?.isProcessing && (
                   <Card>
                     <CardContent className="flex items-center justify-center py-16">
@@ -595,6 +686,7 @@ export default function TranslatePage() {
                   </Card>
                 )}
 
+                {/* Current page result */}
                 {currentPage?.result && (
                   <Card>
                     <CardHeader>
@@ -655,9 +747,24 @@ export default function TranslatePage() {
                     {currentBlocks.length > 0 && (
                       <CardContent>
                         <div className="space-y-3">
-                          <h3 className="text-sm font-semibold text-foreground">
-                            Translation Details (editable)
-                          </h3>
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-semibold text-foreground">
+                              Translation Details (editable)
+                            </h3>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleRerender(activePageIndex)}
+                              disabled={isRerendering}
+                            >
+                              {isRerendering ? (
+                                <Loader2 className="animate-spin size-3.5" />
+                              ) : (
+                                <RefreshCw className="size-3.5" />
+                              )}
+                              Re-render
+                            </Button>
+                          </div>
                           <div className="space-y-2">
                             {currentBlocks.map((block, i) => (
                               <div
@@ -678,6 +785,9 @@ export default function TranslatePage() {
                               </div>
                             ))}
                           </div>
+                          <p className="text-xs text-muted-foreground">
+                            Edit the translations above, then click &quot;Re-render&quot; to update the image.
+                          </p>
                         </div>
                       </CardContent>
                     )}
@@ -688,6 +798,7 @@ export default function TranslatePage() {
                   <RotateCcw className="size-4" />
                   Start Over
                 </Button>
+
               </>
             )}
           </TabsContent>
@@ -742,6 +853,7 @@ export default function TranslatePage() {
                 )}
               </CardContent>
             </Card>
+
           </TabsContent>
         </Tabs>
       </div>

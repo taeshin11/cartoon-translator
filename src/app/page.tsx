@@ -21,33 +21,33 @@ const features = [
   },
   {
     icon: "🌐",
-    title: "50+ Languages",
+    title: "35+ Languages",
     description:
-      "Translate between Japanese, Korean, Chinese, English, Spanish, French, and dozens more.",
+      "Translate between Japanese, Korean, Chinese, English, Spanish, French, German, and many more.",
   },
   {
     icon: "📚",
     title: "Batch Upload",
     description:
-      "Process up to 20 pages at once. Upload a chapter and let the AI handle everything in parallel.",
+      "Process up to 50 pages at once with Pro. Upload a chapter and let the AI handle everything.",
+  },
+  {
+    icon: "🎨",
+    title: "Smart Text Replacement",
+    description:
+      "AI detects speech bubble colors and naturally replaces text — not just white boxes over your manga.",
   },
   {
     icon: "✏️",
-    title: "Edit Before Download",
+    title: "Edit & Re-render",
     description:
-      "Review and tweak every translation bubble before exporting. You stay in control.",
+      "Review, tweak, and re-render every translation bubble before exporting. Full creative control.",
   },
   {
     icon: "🔍",
     title: "Side-by-Side Comparison",
     description:
       "View the original and translated pages together to verify accuracy at a glance.",
-  },
-  {
-    icon: "🎉",
-    title: "Free Forever",
-    description:
-      "No credit card, no trial limits. Core translation features are completely free.",
   },
 ];
 
@@ -58,30 +58,30 @@ const steps = [
     number: "01",
     icon: "⬆️",
     title: "Upload",
-    description: "Drop your manga page image — JPG, PNG, or WebP up to 20 MB.",
+    description: "Drop your manga page image — JPG, PNG, or WebP up to 10 MB.",
   },
   {
     number: "02",
     icon: "🤖",
     title: "AI Processes",
     description:
-      "PaddleOCR detects every text bubble, then AI translates with context awareness.",
+      "OCR detects every text bubble, AI translates, then smart inpainting replaces the original text.",
   },
   {
     number: "03",
     icon: "⬇️",
     title: "Download",
     description:
-      "Get your translated page instantly, with clean typography overlaid on the original art.",
+      "Get your translated page instantly with natural typography matching the speech bubble style.",
   },
 ];
 
 // ─── Stats data ───────────────────────────────────────────────────────────────
 
 const stats = [
-  { value: "20", label: "Pages per batch" },
-  { value: "50+", label: "Languages supported" },
-  { value: "Free", label: "No sign-up needed" },
+  { value: "50", label: "Pages per batch (Pro)" },
+  { value: "35+", label: "Languages supported" },
+  { value: "Free", label: "5 pages/day free" },
   { value: "95%+", label: "CJK OCR accuracy" },
 ];
 
@@ -99,7 +99,6 @@ export default function Home() {
             <span className="font-heading font-semibold text-base tracking-tight text-foreground">
               CartoonTranslator
             </span>
-            <Badge variant="secondary" className="hidden sm:inline-flex">Beta</Badge>
           </div>
           <nav className="flex items-center gap-3">
             <Link
@@ -127,7 +126,6 @@ export default function Home() {
 
         {/* ── Hero ─────────────────────────────────────────────────────────── */}
         <section className="relative overflow-hidden pt-20 pb-16 sm:pt-28 sm:pb-24">
-          {/* Decorative radial glow */}
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-0 -top-24 flex justify-center"
@@ -136,28 +134,24 @@ export default function Home() {
           </div>
 
           <div className="relative mx-auto max-w-6xl px-6 text-center">
-            {/* Eyebrow badge */}
             <div className="mb-6 flex justify-center">
               <Badge variant="outline" className="gap-1.5 rounded-full px-3 py-1 text-xs font-medium border-indigo-200 text-indigo-600">
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
-                AI-Powered OCR Translation
+                AI-Powered Smart Translation
               </Badge>
             </div>
 
-            {/* Heading */}
             <h1 className="mx-auto max-w-3xl text-4xl font-heading font-semibold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl">
               Translate Any Manga or{" "}
               <span className="text-indigo-600">Comic Instantly</span>
             </h1>
 
-            {/* Subheading */}
             <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              AI-powered OCR detects and translates dialogue in manga, comics,
-              and webtoons. Supports Japanese vertical text, Korean, Chinese,
-              and 50+ languages.
+              AI-powered OCR detects dialogue, translates it, and naturally replaces
+              text in speech bubbles — matching the original style. Supports 35+
+              languages including Japanese, Korean, and Chinese.
             </p>
 
-            {/* CTA buttons */}
             <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <Link href="/translate">
                 <Button
@@ -178,10 +172,9 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Mock preview ───────────────────────────────────────────────── */}
+            {/* Mock preview */}
             <div className="mt-16 mx-auto max-w-4xl">
               <div className="rounded-2xl ring-1 ring-border shadow-xl shadow-foreground/5 overflow-hidden bg-card">
-                {/* Window chrome */}
                 <div className="flex items-center gap-1.5 border-b border-border bg-muted/40 px-4 py-3">
                   <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
                   <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
@@ -191,26 +184,21 @@ export default function Home() {
                   </span>
                 </div>
 
-                {/* Before / After panels */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border">
-                  {/* Original panel */}
                   <div className="relative flex flex-col items-center justify-center gap-4 bg-muted/20 p-8 min-h-[240px]">
                     <span className="absolute top-3 left-3">
                       <Badge variant="secondary" className="text-[10px] tracking-wide uppercase">Original</Badge>
                     </span>
-                    {/* Simulated manga page skeleton */}
                     <div className="w-full max-w-[180px] space-y-3 opacity-70">
                       <div className="h-24 rounded-lg bg-muted animate-pulse" />
                       <div className="mx-auto h-5 w-3/4 rounded bg-muted animate-pulse" />
                       <div className="mx-auto h-5 w-1/2 rounded bg-muted animate-pulse" />
                     </div>
-                    {/* Fake speech bubble in Japanese */}
                     <div className="rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium shadow-sm">
                       なるほど！すごい！
                     </div>
                   </div>
 
-                  {/* Translated panel */}
                   <div className="relative flex flex-col items-center justify-center gap-4 bg-indigo-50/40 p-8 min-h-[240px]">
                     <span className="absolute top-3 left-3">
                       <Badge className="text-[10px] tracking-wide uppercase bg-indigo-600">Translated</Badge>
@@ -220,7 +208,6 @@ export default function Home() {
                       <div className="mx-auto h-5 w-3/4 rounded bg-indigo-100 animate-pulse" />
                       <div className="mx-auto h-5 w-1/2 rounded bg-indigo-100 animate-pulse" />
                     </div>
-                    {/* Translated speech bubble */}
                     <div className="rounded-xl border border-indigo-200 bg-card px-4 py-2 text-sm font-medium shadow-sm text-indigo-700">
                       I see! Amazing!
                     </div>
@@ -228,7 +215,7 @@ export default function Home() {
                 </div>
               </div>
               <p className="mt-3 text-center text-xs text-muted-foreground">
-                Before &amp; after — live translation preview
+                Before &amp; after — smart text replacement preview
               </p>
             </div>
           </div>
@@ -250,7 +237,6 @@ export default function Home() {
             </div>
 
             <div className="relative grid gap-6 sm:grid-cols-3">
-              {/* Connector line (desktop) */}
               <div
                 aria-hidden="true"
                 className="absolute top-12 left-[calc(16.66%+1rem)] right-[calc(16.66%+1rem)] hidden h-px bg-gradient-to-r from-indigo-200 via-indigo-300 to-indigo-200 sm:block"
@@ -262,11 +248,9 @@ export default function Home() {
                   className="relative flex flex-col items-center text-center rounded-2xl shadow-sm bg-card border-0"
                 >
                   <CardHeader className="w-full items-center pb-0">
-                    {/* Step number chip */}
                     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white shadow-md shadow-indigo-200">
                       {step.number}
                     </div>
-                    {/* Icon */}
                     <div className="mb-1 text-3xl" aria-hidden="true">
                       {step.icon}
                     </div>
@@ -285,12 +269,12 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── Features ─────────────────────────────────────────────────────── */}
-        {/* Ad Banner between sections */}
+        {/* ── Ad Banner ──────────────────────────────────────────────────── */}
         <div className="flex justify-center py-4">
           <AdBanner />
         </div>
 
+        {/* ── Features ─────────────────────────────────────────────────────── */}
         <section id="features" className="py-20 sm:py-28 bg-muted/30">
           <div className="mx-auto max-w-6xl px-6">
             <div className="text-center mb-14">
@@ -363,17 +347,16 @@ export default function Home() {
         </section>
 
         {/* ── Final CTA ────────────────────────────────────────────────────── */}
-        <section className="py-20 sm:py-28 bg-muted/30">
+        <section className="py-20 sm:py-28">
           <div className="mx-auto max-w-3xl px-6 text-center">
-            {/* Decorative emoji */}
             <div className="mb-5 text-5xl" aria-hidden="true">📖✨</div>
 
             <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
               Ready to translate your favorite manga?
             </h2>
             <p className="mt-4 text-muted-foreground sm:text-lg leading-relaxed">
-              No account required. Just upload a page and get a translation in
-              seconds — completely free.
+              No account required. Just upload a page and get a natural-looking
+              translation in seconds — completely free.
             </p>
 
             <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
@@ -392,19 +375,21 @@ export default function Home() {
 
             {/* Language chips */}
             <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
-              {["🇯🇵 Japanese", "🇰🇷 Korean", "🇨🇳 Chinese", "🇺🇸 English", "🇪🇸 Spanish", "🇫🇷 French", "+ 44 more"].map(
-                (lang) => (
-                  <Badge key={lang} variant="secondary" className="rounded-full px-3 py-1 text-xs">
-                    {lang}
-                  </Badge>
-                )
-              )}
+              {[
+                "🇯🇵 Japanese", "🇰🇷 Korean", "🇨🇳 Chinese", "🇺🇸 English",
+                "🇪🇸 Spanish", "🇫🇷 French", "🇩🇪 German", "🇧🇷 Portuguese",
+                "🇮🇹 Italian", "🇷🇺 Russian", "🇹🇭 Thai", "🇻🇳 Vietnamese",
+                "+ 23 more",
+              ].map((lang) => (
+                <Badge key={lang} variant="secondary" className="rounded-full px-3 py-1 text-xs">
+                  {lang}
+                </Badge>
+              ))}
             </div>
           </div>
         </section>
       </main>
 
-      {/* Adsterra Social Bar */}
       <AdSocialBar />
 
       {/* ── Footer ───────────────────────────────────────────────────────────── */}

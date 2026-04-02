@@ -8,8 +8,10 @@ const TRANSLATION_API_URL =
 const GOOGLE_SHEETS_WEBHOOK_URL =
   process.env.NEXT_PUBLIC_GOOGLE_SHEETS_WEBHOOK_URL || "";
 
-// OCR.space free API key (free tier: 25,000 requests/month)
 const OCR_SPACE_API_KEY = process.env.OCR_SPACE_API_KEY || "K85403682488957";
+
+// Daily free limit
+const FREE_DAILY_LIMIT = 5;
 
 interface OcrBlock {
   text: string;
@@ -51,13 +53,39 @@ async function extractWithOcrSpace(
     es: "spa",
     fr: "fre",
     de: "ger",
+    pt: "por",
+    it: "ita",
+    ru: "rus",
+    ar: "ara",
+    th: "tai",
+    vi: "vie",
+    id: "ind",
+    ms: "msa",
+    tr: "tur",
+    pl: "pol",
+    nl: "dut",
+    sv: "swe",
+    da: "dan",
+    no: "nor",
+    fi: "fin",
+    hu: "hun",
+    cs: "cze",
+    ro: "rum",
+    bg: "bul",
+    hr: "hrv",
+    uk: "ukr",
+    hi: "hin",
   };
 
   const formData = new FormData();
-  formData.append("file", new Blob([new Uint8Array(imageBuffer)], { type: "image/png" }), "image.png");
+  formData.append(
+    "file",
+    new Blob([new Uint8Array(imageBuffer)], { type: "image/png" }),
+    "image.png"
+  );
   formData.append("language", langMap[lang] || "jpn");
   formData.append("isOverlayRequired", "true");
-  formData.append("OCREngine", "2"); // Engine 2 is better for Asian languages
+  formData.append("OCREngine", "2");
 
   const response = await fetch("https://api.ocr.space/parse/image", {
     method: "POST",
@@ -79,15 +107,24 @@ async function extractWithOcrSpace(
       const words = line.Words || [];
       if (words.length === 0) continue;
 
-      // Combine words into a line with bounding box
-      const lineText = line.LineText || words.map((w: { WordText: string }) => w.WordText).join(" ");
-      const minX = Math.min(...words.map((w: { Left: number }) => w.Left));
-      const minY = Math.min(...words.map((w: { Top: number }) => w.Top));
+      const lineText =
+        line.LineText ||
+        words.map((w: { WordText: string }) => w.WordText).join(" ");
+      const minX = Math.min(
+        ...words.map((w: { Left: number }) => w.Left)
+      );
+      const minY = Math.min(
+        ...words.map((w: { Top: number }) => w.Top)
+      );
       const maxX = Math.max(
-        ...words.map((w: { Left: number; Width: number }) => w.Left + w.Width)
+        ...words.map(
+          (w: { Left: number; Width: number }) => w.Left + w.Width
+        )
       );
       const maxY = Math.max(
-        ...words.map((w: { Top: number; Height: number }) => w.Top + w.Height)
+        ...words.map(
+          (w: { Top: number; Height: number }) => w.Top + w.Height
+        )
       );
 
       blocks.push({
@@ -102,8 +139,9 @@ async function extractWithOcrSpace(
       });
     }
   } else if (result.ParsedText) {
-    // Fallback: no overlay data, just return text without position
-    const lines = result.ParsedText.split("\n").filter((l: string) => l.trim());
+    const lines = result.ParsedText.split("\n").filter(
+      (l: string) => l.trim()
+    );
     for (const line of lines) {
       blocks.push({
         text: line.trim(),
@@ -132,25 +170,52 @@ async function extractText(
 }
 
 // ---------- Translation ----------
+const LANG_MAP: Record<string, string> = {
+  auto: "autodetect",
+  ja: "ja",
+  ko: "ko",
+  zh: "zh-CN",
+  "zh-TW": "zh-TW",
+  en: "en",
+  es: "es",
+  fr: "fr",
+  de: "de",
+  pt: "pt",
+  "pt-BR": "pt-BR",
+  it: "it",
+  ru: "ru",
+  ar: "ar",
+  th: "th",
+  vi: "vi",
+  id: "id",
+  ms: "ms",
+  tr: "tr",
+  pl: "pl",
+  nl: "nl",
+  sv: "sv",
+  da: "da",
+  no: "no",
+  fi: "fi",
+  hu: "hu",
+  cs: "cs",
+  ro: "ro",
+  bg: "bg",
+  hr: "hr",
+  uk: "uk",
+  hi: "hi",
+  bn: "bn",
+  tl: "tl",
+  he: "he",
+  el: "el",
+};
+
 async function translateText(
   text: string,
   sourceLang: string,
   targetLang: string
 ): Promise<string> {
-  const langMap: Record<string, string> = {
-    auto: "autodetect",
-    ja: "ja",
-    ko: "ko",
-    zh: "zh-CN",
-    "zh-TW": "zh-TW",
-    en: "en",
-    es: "es",
-    fr: "fr",
-    de: "de",
-  };
-
-  const src = langMap[sourceLang] || sourceLang;
-  const tgt = langMap[targetLang] || targetLang;
+  const src = LANG_MAP[sourceLang] || sourceLang;
+  const tgt = LANG_MAP[targetLang] || targetLang;
   const url = `${TRANSLATION_API_URL}?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}`;
 
   try {
@@ -163,17 +228,136 @@ async function translateText(
   }
 }
 
-// ---------- Image Reconstruction ----------
+// ---------- Smart Background Color Detection ----------
+async function detectBackgroundColor(
+  imageBuffer: Buffer,
+  bbox: number[][]
+): Promise<{ r: number; g: number; b: number }> {
+  try {
+    const xs = bbox.map((p) => p[0]);
+    const ys = bbox.map((p) => p[1]);
+    const minX = Math.min(...xs);
+    const minY = Math.min(...ys);
+    const maxX = Math.max(...xs);
+    const maxY = Math.max(...ys);
+    const bw = maxX - minX;
+    const bh = maxY - minY;
+
+    if (bw <= 0 || bh <= 0) return { r: 255, g: 255, b: 255 };
+
+    // Sample a thin border around the text region to detect bubble background
+    const pad = Math.max(2, Math.min(8, Math.floor(Math.min(bw, bh) * 0.1)));
+    const sampleX = Math.max(0, Math.floor(minX - pad));
+    const sampleY = Math.max(0, Math.floor(minY - pad));
+    const sampleW = Math.floor(bw + pad * 2);
+    const sampleH = Math.floor(bh + pad * 2);
+
+    if (sampleW <= 0 || sampleH <= 0) return { r: 255, g: 255, b: 255 };
+
+    // Extract the region and get dominant color via resize to 1x1
+    const { data, info } = await sharp(imageBuffer)
+      .extract({
+        left: sampleX,
+        top: sampleY,
+        width: sampleW,
+        height: sampleH,
+      })
+      .resize(1, 1, { fit: "cover" })
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+
+    if (info.channels >= 3) {
+      return { r: data[0], g: data[1], b: data[2] };
+    }
+    return { r: 255, g: 255, b: 255 };
+  } catch {
+    return { r: 255, g: 255, b: 255 };
+  }
+}
+
+// ---------- Smart Text Wrapping ----------
+function wrapText(
+  text: string,
+  maxWidth: number,
+  fontSize: number,
+  charWidthRatio: number
+): string[] {
+  const charWidth = fontSize * charWidthRatio;
+  const maxChars = Math.max(1, Math.floor(maxWidth / charWidth));
+
+  if (text.length <= maxChars) return [text];
+
+  const words = text.split(/\s+/);
+  const lines: string[] = [];
+  let currentLine = "";
+
+  for (const word of words) {
+    if (currentLine.length === 0) {
+      currentLine = word;
+    } else if (currentLine.length + 1 + word.length <= maxChars) {
+      currentLine += " " + word;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+
+  // If still too long (e.g., CJK without spaces), force-break
+  const result: string[] = [];
+  for (const line of lines) {
+    if (line.length > maxChars) {
+      for (let i = 0; i < line.length; i += maxChars) {
+        result.push(line.slice(i, i + maxChars));
+      }
+    } else {
+      result.push(line);
+    }
+  }
+  return result;
+}
+
+// ---------- Determine character width ratio based on target language ----------
+function getCharWidthRatio(targetLang: string): number {
+  // CJK characters are roughly full-width
+  if (["ja", "ko", "zh", "zh-TW"].includes(targetLang)) return 0.9;
+  // Arabic, Hindi, Bengali — slightly wider than Latin
+  if (["ar", "hi", "bn", "he"].includes(targetLang)) return 0.6;
+  // Latin-based languages
+  return 0.52;
+}
+
+// ---------- Get font family for target language ----------
+function getFontFamily(targetLang: string): string {
+  if (["ja"].includes(targetLang))
+    return "'Noto Sans JP', 'Hiragino Sans', 'MS Gothic', sans-serif";
+  if (["ko"].includes(targetLang))
+    return "'Noto Sans KR', 'Malgun Gothic', sans-serif";
+  if (["zh", "zh-TW"].includes(targetLang))
+    return "'Noto Sans SC', 'Microsoft YaHei', sans-serif";
+  if (["ar", "he"].includes(targetLang))
+    return "'Noto Sans Arabic', 'Segoe UI', sans-serif";
+  if (["hi", "bn"].includes(targetLang))
+    return "'Noto Sans Devanagari', 'Segoe UI', sans-serif";
+  if (["th"].includes(targetLang))
+    return "'Noto Sans Thai', 'Tahoma', sans-serif";
+  return "Arial, 'Noto Sans', sans-serif";
+}
+
+// ---------- Image Reconstruction (Smart Inpainting) ----------
 async function reconstructImage(
   imageBuffer: Buffer,
   blocks: OcrBlock[],
-  translations: string[]
+  translations: string[],
+  targetLang: string
 ): Promise<Buffer> {
   const metadata = await sharp(imageBuffer).metadata();
   const width = metadata.width || 800;
   const height = metadata.height || 600;
 
   const svgParts: string[] = [];
+  const charWidthRatio = getCharWidthRatio(targetLang);
+  const fontFamily = getFontFamily(targetLang);
 
   for (let i = 0; i < blocks.length; i++) {
     const block = blocks[i];
@@ -191,23 +375,62 @@ async function reconstructImage(
 
     if (bw <= 0 || bh <= 0) continue;
 
-    // White rectangle to cover original text
+    // Detect background color of the speech bubble
+    const bgColor = await detectBackgroundColor(imageBuffer, block.bbox);
+    const bgHex = `rgb(${bgColor.r},${bgColor.g},${bgColor.b})`;
+
+    // Choose text color based on background brightness
+    const brightness =
+      bgColor.r * 0.299 + bgColor.g * 0.587 + bgColor.b * 0.114;
+    const textColor = brightness > 128 ? "black" : "white";
+
+    // Add padding (extend coverage slightly beyond bbox)
+    const padX = Math.max(2, Math.floor(bw * 0.05));
+    const padY = Math.max(2, Math.floor(bh * 0.08));
+    const coverX = Math.max(0, minX - padX);
+    const coverY = Math.max(0, minY - padY);
+    const coverW = Math.min(width - coverX, bw + padX * 2);
+    const coverH = Math.min(height - coverY, bh + padY * 2);
+
+    // Background fill to cover original text
     svgParts.push(
-      `<rect x="${minX}" y="${minY}" width="${bw}" height="${bh}" fill="white" rx="2"/>`
+      `<rect x="${coverX}" y="${coverY}" width="${coverW}" height="${coverH}" fill="${bgHex}" rx="3"/>`
     );
 
-    // Calculate font size to fit
-    const fontSize = Math.max(
-      10,
-      Math.min(bh * 0.7, bw / Math.max(translation.length * 0.55, 1))
+    // Calculate font size — try to fit multi-line
+    const innerW = bw - padX;
+    const innerH = bh - padY;
+
+    // Start with height-based estimate, then refine
+    let fontSize = Math.max(
+      9,
+      Math.min(innerH * 0.65, innerW / Math.max(translation.length * charWidthRatio, 1))
     );
 
-    svgParts.push(
-      `<text x="${minX + bw / 2}" y="${minY + bh / 2}" ` +
-        `font-family="Arial, sans-serif" font-size="${fontSize}" ` +
-        `fill="black" text-anchor="middle" dominant-baseline="central" ` +
-        `font-weight="bold">${escapeXml(translation)}</text>`
-    );
+    // Wrap text and adjust font size to fit vertically
+    let lines = wrapText(translation, innerW, fontSize, charWidthRatio);
+    const maxLines = Math.max(1, Math.floor(innerH / (fontSize * 1.25)));
+
+    // If too many lines, reduce font size
+    while (lines.length > maxLines && fontSize > 8) {
+      fontSize -= 1;
+      lines = wrapText(translation, innerW, fontSize, charWidthRatio);
+    }
+
+    // Cap at reasonable limits
+    fontSize = Math.min(fontSize, 48);
+    const lineHeight = fontSize * 1.25;
+    const totalTextHeight = lines.length * lineHeight;
+    const startY = minY + (bh - totalTextHeight) / 2 + fontSize * 0.85;
+
+    for (let li = 0; li < lines.length; li++) {
+      svgParts.push(
+        `<text x="${minX + bw / 2}" y="${startY + li * lineHeight}" ` +
+          `font-family="${fontFamily}" font-size="${fontSize}" ` +
+          `fill="${textColor}" text-anchor="middle" ` +
+          `font-weight="bold">${escapeXml(lines[li])}</text>`
+      );
+    }
   }
 
   if (svgParts.length === 0) return imageBuffer;
@@ -245,6 +468,51 @@ async function logToGoogleSheets(data: Record<string, unknown>) {
   }
 }
 
+// ---------- Usage tracking ----------
+function getUsageKey(): string {
+  const today = new Date().toISOString().slice(0, 10);
+  return `usage_${today}`;
+}
+
+// In-memory usage store (resets on cold start, per-IP daily tracking)
+const usageStore = new Map<string, number>();
+
+function checkAndIncrementUsage(
+  ip: string,
+  pageCount: number,
+  isPro: boolean
+): { allowed: boolean; remaining: number; limit: number } {
+  if (isPro) return { allowed: true, remaining: 999, limit: 999 };
+
+  const key = `${getUsageKey()}_${ip}`;
+  const current = usageStore.get(key) || 0;
+
+  if (current + pageCount > FREE_DAILY_LIMIT) {
+    return {
+      allowed: false,
+      remaining: Math.max(0, FREE_DAILY_LIMIT - current),
+      limit: FREE_DAILY_LIMIT,
+    };
+  }
+
+  usageStore.set(key, current + pageCount);
+  return {
+    allowed: true,
+    remaining: Math.max(0, FREE_DAILY_LIMIT - current - pageCount),
+    limit: FREE_DAILY_LIMIT,
+  };
+}
+
+// Clean up old usage entries periodically
+setInterval(() => {
+  const todayKey = getUsageKey();
+  for (const key of usageStore.keys()) {
+    if (!key.startsWith(todayKey)) {
+      usageStore.delete(key);
+    }
+  }
+}, 60 * 60 * 1000); // Every hour
+
 // ---------- POST handler ----------
 export async function POST(request: NextRequest) {
   try {
@@ -252,6 +520,22 @@ export async function POST(request: NextRequest) {
     const image = formData.get("image") as File | null;
     const sourceLang = (formData.get("sourceLang") as string) || "auto";
     const targetLang = (formData.get("targetLang") as string) || "en";
+    const proKey = (formData.get("proKey") as string) || "";
+
+    // Check pro status (simple key validation for now)
+    const isPro =
+      !!proKey &&
+      !!process.env.STRIPE_SECRET_KEY &&
+      proKey.startsWith("ct_pro_");
+
+    // Get client IP for rate limiting
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+
+    // Usage tracking (limits disabled — Pro launch pending)
+    const usage = checkAndIncrementUsage(ip, 1, true);
 
     if (!image) {
       return Response.json(
@@ -278,13 +562,18 @@ export async function POST(request: NextRequest) {
       blocks.map((block) => translateText(block.text, sourceLang, targetLang))
     );
 
-    // Step 3: Reconstruct image
+    // Step 3: Reconstruct image with smart inpainting
     const hasPositionData = blocks.some((b) => b.bbox && b.bbox.length >= 4);
     let resultBuffer: Buffer | null = null;
     let resultUrl: string | undefined;
 
     if (hasPositionData) {
-      resultBuffer = await reconstructImage(imageBuffer, blocks, translations);
+      resultBuffer = await reconstructImage(
+        imageBuffer,
+        blocks,
+        translations,
+        targetLang
+      );
       const base64 = resultBuffer.toString("base64");
       resultUrl = `data:image/png;base64,${base64}`;
     }
@@ -296,6 +585,7 @@ export async function POST(request: NextRequest) {
       target_lang: targetLang,
       page_count: 1,
       text_count: blocks.length,
+      is_pro: isPro,
       user_agent: request.headers.get("user-agent") || "unknown",
       referrer: request.headers.get("referer") || "direct",
     });
@@ -308,7 +598,13 @@ export async function POST(request: NextRequest) {
         original: b.text,
         translated: translations[i],
         confidence: b.confidence,
+        bbox: b.bbox,
       })),
+      usage: {
+        remaining: usage.remaining,
+        limit: usage.limit,
+        isPro,
+      },
     });
   } catch (err) {
     return Response.json(
