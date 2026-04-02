@@ -1,0 +1,194 @@
+{
+  "project": "CartoonTranslator",
+  "features": [
+    {
+      "id": "M1-001",
+      "milestone": 1,
+      "name": "Project Scaffold",
+      "description": "Next.js + Tailwind + shadcn/ui initialization",
+      "status": "completed"
+    },
+    {
+      "id": "M1-002",
+      "milestone": 1,
+      "name": "Soft Color Theme",
+      "description": "Warm gray/lavender background, soft indigo accent, modern UI palette",
+      "status": "in_progress"
+    },
+    {
+      "id": "M1-003",
+      "milestone": 1,
+      "name": "Responsive Navbar",
+      "description": "Navigation bar with mobile hamburger menu",
+      "status": "in_progress"
+    },
+    {
+      "id": "M1-004",
+      "milestone": 1,
+      "name": "Landing Page",
+      "description": "Hero section, features grid, how it works, CTA",
+      "status": "in_progress"
+    },
+    {
+      "id": "M1-005",
+      "milestone": 1,
+      "name": "Translate Page UI",
+      "description": "Image upload, language selection, translate button",
+      "status": "in_progress"
+    },
+    {
+      "id": "M1-006",
+      "milestone": 1,
+      "name": "FAQ Page",
+      "description": "FAQ with structured data for SEO",
+      "status": "in_progress"
+    },
+    {
+      "id": "M1-007",
+      "milestone": 1,
+      "name": "About Page",
+      "description": "About the service page",
+      "status": "in_progress"
+    },
+    {
+      "id": "M1-008",
+      "milestone": 1,
+      "name": "SEO Setup",
+      "description": "Meta tags, sitemap, robots.txt, Open Graph",
+      "status": "in_progress"
+    },
+    {
+      "id": "M1-009",
+      "milestone": 1,
+      "name": "Visitor Counter",
+      "description": "Today + total visitor count in footer",
+      "status": "in_progress"
+    },
+    {
+      "id": "M1-010",
+      "milestone": 1,
+      "name": "Adsterra Ad Slots",
+      "description": "Reusable ad components with placeholder keys",
+      "status": "in_progress"
+    },
+    {
+      "id": "M1-011",
+      "milestone": 1,
+      "name": "GitHub Repo + Vercel Deploy",
+      "description": "Create repo via gh CLI, deploy to Vercel",
+      "status": "pending"
+    },
+    {
+      "id": "M2-001",
+      "milestone": 2,
+      "name": "PaddleOCR FastAPI Server",
+      "description": "Python FastAPI microservice with PaddleOCR, Dockerfile for Railway",
+      "status": "pending"
+    },
+    {
+      "id": "M2-002",
+      "milestone": 2,
+      "name": "OCR Integration",
+      "description": "Connect frontend to PaddleOCR API, text extraction with bounding boxes",
+      "status": "pending"
+    },
+    {
+      "id": "M2-003",
+      "milestone": 2,
+      "name": "Translation API",
+      "description": "Integrate LibreTranslate or MyMemory free API",
+      "status": "pending"
+    },
+    {
+      "id": "M2-004",
+      "milestone": 2,
+      "name": "Image Reconstruction",
+      "description": "Render translated text back onto image at correct positions",
+      "status": "pending"
+    },
+    {
+      "id": "M2-005",
+      "milestone": 2,
+      "name": "Google Sheets Webhook",
+      "description": "Auto POST translation data to Google Sheets via Apps Script",
+      "status": "pending"
+    },
+    {
+      "id": "M2-006",
+      "milestone": 2,
+      "name": "Railway Deployment",
+      "description": "Deploy PaddleOCR server to Railway free tier",
+      "status": "pending"
+    },
+    {
+      "id": "M3-001",
+      "milestone": 3,
+      "name": "Batch Upload",
+      "description": "Upload multiple pages at once (up to 20)",
+      "status": "pending"
+    },
+    {
+      "id": "M3-002",
+      "milestone": 3,
+      "name": "Side-by-Side View",
+      "description": "Original vs translated comparison slider",
+      "status": "pending"
+    },
+    {
+      "id": "M3-003",
+      "milestone": 3,
+      "name": "Editable Translation",
+      "description": "Edit translated text before final render",
+      "status": "pending"
+    },
+    {
+      "id": "M3-004",
+      "milestone": 3,
+      "name": "Translation History",
+      "description": "LocalStorage-based history of recent translations",
+      "status": "pending"
+    },
+    {
+      "id": "M3-005",
+      "milestone": 3,
+      "name": "Loading Animations",
+      "description": "Progress indicators and smooth animations",
+      "status": "pending"
+    },
+    {
+      "id": "M4-001",
+      "milestone": 4,
+      "name": "SEO Blog",
+      "description": "Blog section with 3+ keyword-rich articles",
+      "status": "pending"
+    },
+    {
+      "id": "M4-002",
+      "milestone": 4,
+      "name": "FAQ Structured Data",
+      "description": "Schema.org FAQPage markup",
+      "status": "pending"
+    },
+    {
+      "id": "M4-003",
+      "milestone": 4,
+      "name": "PWA Support",
+      "description": "Manifest + service worker for installable app",
+      "status": "pending"
+    },
+    {
+      "id": "M4-004",
+      "milestone": 4,
+      "name": "Adsterra Live Keys",
+      "description": "Configure actual Adsterra ad unit keys",
+      "status": "pending"
+    },
+    {
+      "id": "M4-005",
+      "milestone": 4,
+      "name": "Performance Optimization",
+      "description": "Lighthouse 90+ score, lazy loading, image optimization",
+      "status": "pending"
+    }
+  ]
+}
