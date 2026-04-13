@@ -83,58 +83,48 @@ export default function AdsterraAd({
 // Convenience variants
 // ---------------------------------------------------------------------------
 
-const ADSTERRA_BANNER_KEY =
-  process.env.NEXT_PUBLIC_ADSTERRA_BANNER_KEY ?? "";
+const ADSTERRA_BANNER_KEY = "ac84de1f04617a88c8d2213336a9b320"; // 728x90
+const ADSTERRA_BANNER_468_KEY = "1a9b63fc87681075dca4283da5917c8a"; // 468x60
+const ADSTERRA_NATIVE_URL = "https://pl29139696.profitablecpmratenetwork.com/493be860b3ec4369df7457254f120966/invoke.js";
+const ADSTERRA_NATIVE_CONTAINER = "container-493be860b3ec4369df7457254f120966";
+const ADSTERRA_SOCIAL_URL = "https://pl29139695.profitablecpmratenetwork.com/37/4b/55/374b55859102e685628a30c2017b7c24.js";
 
-const ADSTERRA_NATIVE_KEY =
-  process.env.NEXT_PUBLIC_ADSTERRA_NATIVE_KEY ?? "";
+// Legacy env var fallbacks (unused now but kept for reference)
+const ADSTERRA_NATIVE_KEY = process.env.NEXT_PUBLIC_ADSTERRA_NATIVE_KEY ?? "";
+const ADSTERRA_SOCIAL_KEY = process.env.NEXT_PUBLIC_ADSTERRA_SOCIAL_KEY ?? "";
 
-const ADSTERRA_SOCIAL_KEY =
-  process.env.NEXT_PUBLIC_ADSTERRA_SOCIAL_KEY ?? "";
-
-/**
- * AdBanner — standard leaderboard / rectangle banner unit.
- * Defaults to 728×90. Pass `width` and `height` to override.
- */
-export function AdBanner({
-  adKey = ADSTERRA_BANNER_KEY,
-  width = 728,
-  height = 90,
-}: Partial<AdsterraAdProps>) {
-  return (
-    <AdsterraAd adKey={adKey} width={width} height={height} format="banner" />
-  );
+/** AdBanner — 728×90 leaderboard */
+export function AdBanner() {
+  return <AdsterraAd adKey={ADSTERRA_BANNER_KEY} width={728} height={90} format="banner" />;
 }
 
-/**
- * AdNative — Adsterra native ad unit.
- * Width and height are advisory; native units are typically fluid.
- */
-export function AdNative({
-  adKey = ADSTERRA_NATIVE_KEY,
-  width = 300,
-  height = 250,
-}: Partial<AdsterraAdProps>) {
-  return (
-    <AdsterraAd adKey={adKey} width={width} height={height} format="native" />
-  );
+/** AdBanner468 — 468×60 banner */
+export function AdBanner468() {
+  return <AdsterraAd adKey={ADSTERRA_BANNER_468_KEY} width={468} height={60} format="banner" />;
 }
 
-/**
- * AdSocialBar — Adsterra Social Bar (sticky bottom bar format).
- * Renders a full-width social-style unit; width/height are informational only.
- */
-export function AdSocialBar({
-  adKey = ADSTERRA_SOCIAL_KEY,
-  width = 0,
-  height = 0,
-}: Partial<AdsterraAdProps>) {
-  return (
-    <AdsterraAd
-      adKey={adKey}
-      width={width}
-      height={height}
-      format="social"
-    />
-  );
+/** AdNative — Adsterra native banner (container + script URL) */
+export function AdNative() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!ref.current) return;
+    const s = document.createElement("script");
+    s.async = true;
+    s.setAttribute("data-cfasync", "false");
+    s.src = ADSTERRA_NATIVE_URL;
+    ref.current.appendChild(s);
+    return () => { if (ref.current?.contains(s)) ref.current.removeChild(s); };
+  }, []);
+  return <div ref={ref} id={ADSTERRA_NATIVE_CONTAINER} />;
+}
+
+/** AdSocialBar — sticky social bar (direct script URL) */
+export function AdSocialBar() {
+  useEffect(() => {
+    const s = document.createElement("script");
+    s.src = ADSTERRA_SOCIAL_URL;
+    document.head.appendChild(s);
+    return () => { if (document.head.contains(s)) document.head.removeChild(s); };
+  }, []);
+  return null;
 }
