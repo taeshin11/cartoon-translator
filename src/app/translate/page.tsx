@@ -96,8 +96,6 @@ interface TranslationResult {
   message: string
   imageUrl?: string
   blocks?: TranslationBlock[]
-  limitReached?: boolean
-  usage?: { remaining: number; limit: number; isPro: boolean }
 }
 
 interface PageResult {
@@ -132,6 +130,8 @@ function saveHistory(items: HistoryItem[]) {
   }
 }
 
+const LOCALE_STORAGE_KEY = "ct_target_lang"
+
 export default function TranslatePage() {
   const [pages, setPages] = useState<PageResult[]>([])
   const [sourceLanguage, setSourceLanguage] = useState("auto")
@@ -153,6 +153,12 @@ export default function TranslatePage() {
 
   useEffect(() => {
     setHistory(loadHistory())
+    // Apply browser-detected locale preference (set by LocaleDetector in root layout)
+    const savedLang = localStorage.getItem(LOCALE_STORAGE_KEY)
+    if (savedLang) {
+      const isSupported = TARGET_LANGUAGES.some((l) => l.value === savedLang)
+      if (isSupported) setTargetLanguage(savedLang)
+    }
   }, [])
 
   const validateFiles = useCallback(

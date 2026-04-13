@@ -10,9 +10,6 @@ const GOOGLE_SHEETS_WEBHOOK_URL =
 
 const OCR_SPACE_API_KEY = process.env.OCR_SPACE_API_KEY || "K85403682488957";
 
-// Daily free limit
-const FREE_DAILY_LIMIT = 5;
-
 interface OcrBlock {
   text: string;
   confidence: number;
@@ -468,51 +465,6 @@ async function logToGoogleSheets(data: Record<string, unknown>) {
   }
 }
 
-// ---------- Usage tracking ----------
-function getUsageKey(): string {
-  const today = new Date().toISOString().slice(0, 10);
-  return `usage_${today}`;
-}
-
-// In-memory usage store (resets on cold start, per-IP daily tracking)
-const usageStore = new Map<string, number>();
-
-function checkAndIncrementUsage(
-  ip: string,
-  pageCount: number,
-  isPro: boolean
-): { allowed: boolean; remaining: number; limit: number } {
-  if (isPro) return { allowed: true, remaining: 999, limit: 999 };
-
-  const key = `${getUsageKey()}_${ip}`;
-  const current = usageStore.get(key) || 0;
-
-  if (current + pageCount > FREE_DAILY_LIMIT) {
-    return {
-      allowed: false,
-      remaining: Math.max(0, FREE_DAILY_LIMIT - current),
-      limit: FREE_DAILY_LIMIT,
-    };
-  }
-
-  usageStore.set(key, current + pageCount);
-  return {
-    allowed: true,
-    remaining: Math.max(0, FREE_DAILY_LIMIT - current - pageCount),
-    limit: FREE_DAILY_LIMIT,
-  };
-}
-
-// Clean up old usage entries periodically
-setInterval(() => {
-  const todayKey = getUsageKey();
-  for (const key of usageStore.keys()) {
-    if (!key.startsWith(todayKey)) {
-      usageStore.delete(key);
-    }
-  }
-}, 60 * 60 * 1000); // Every hour
-
 // ---------- POST handler ----------
 export async function POST(request: NextRequest) {
   try {
@@ -520,22 +472,6 @@ export async function POST(request: NextRequest) {
     const image = formData.get("image") as File | null;
     const sourceLang = (formData.get("sourceLang") as string) || "auto";
     const targetLang = (formData.get("targetLang") as string) || "en";
-    const proKey = (formData.get("proKey") as string) || "";
-
-    // Check pro status (simple key validation for now)
-    const isPro =
-      !!proKey &&
-      !!process.env.STRIPE_SECRET_KEY &&
-      proKey.startsWith("ct_pro_");
-
-    // Get client IP for rate limiting
-    const ip =
-      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      request.headers.get("x-real-ip") ||
-      "unknown";
-
-    // Usage tracking (limits disabled — Pro launch pending)
-    const usage = checkAndIncrementUsage(ip, 1, true);
 
     if (!image) {
       return Response.json(
@@ -585,7 +521,6 @@ export async function POST(request: NextRequest) {
       target_lang: targetLang,
       page_count: 1,
       text_count: blocks.length,
-      is_pro: isPro,
       user_agent: request.headers.get("user-agent") || "unknown",
       referrer: request.headers.get("referer") || "direct",
     });
@@ -600,11 +535,6 @@ export async function POST(request: NextRequest) {
         confidence: b.confidence,
         bbox: b.bbox,
       })),
-      usage: {
-        remaining: usage.remaining,
-        limit: usage.limit,
-        isPro,
-      },
     });
   } catch (err) {
     return Response.json(
