@@ -11,17 +11,20 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/translate", label: "Translate" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/blog", label: "Blog" },
-  { href: "/about", label: "About" },
-]
+import { LanguageSelector } from "@/components/language-selector"
+import { useT } from "@/lib/i18n/TranslationContext"
 
 export function Navbar() {
+  const t = useT()
   const [open, setOpen] = React.useState(false)
+
+  const navLinks = [
+    { href: "/", labelKey: "nav.home" },
+    { href: "/translate", labelKey: "nav.translate" },
+    { href: "/faq", labelKey: "nav.faq" },
+    { href: "/blog", labelKey: "nav.blog" },
+    { href: "/about", labelKey: "nav.about" },
+  ]
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
@@ -31,7 +34,7 @@ export function Navbar() {
           href="/"
           className="flex items-center gap-2 font-semibold text-foreground hover:text-primary transition-colors"
         >
-          <span className="text-lg">CartoonTranslator</span>
+          <span className="text-lg">{t("nav.appName")}</span>
         </Link>
 
         {/* Desktop nav */}
@@ -42,13 +45,15 @@ export function Navbar() {
               href={link.href}
               className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
-              {link.label}
+              {t(link.labelKey)}
             </Link>
           ))}
+          <LanguageSelector />
         </nav>
 
-        {/* Mobile hamburger */}
-        <div className="md:hidden">
+        {/* Mobile: language selector + hamburger */}
+        <div className="md:hidden flex items-center gap-1">
+          <LanguageSelector />
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
               render={
@@ -59,7 +64,7 @@ export function Navbar() {
             </SheetTrigger>
             <SheetContent side="right">
               <SheetHeader>
-                <SheetTitle>CartoonTranslator</SheetTitle>
+                <SheetTitle>{t("nav.appName")}</SheetTitle>
               </SheetHeader>
               <nav className="mt-6 flex flex-col gap-1 px-4">
                 {navLinks.map((link) => (
@@ -69,7 +74,7 @@ export function Navbar() {
                     onClick={() => setOpen(false)}
                     className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                   >
-                    {link.label}
+                    {t(link.labelKey)}
                   </Link>
                 ))}
               </nav>

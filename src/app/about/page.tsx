@@ -1,48 +1,26 @@
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "About - CartoonTranslator",
-  description:
-    "Learn about CartoonTranslator — a free, open-source manga and comic translation tool built with PaddleOCR and AI. Built for manga fans, by manga fans.",
-};
+import { useT } from "@/lib/i18n/TranslationContext";
 
-const steps = [
-  {
-    number: "01",
-    title: "Upload a page",
-    description:
-      "Drop in any PNG, JPEG, or WebP scan of your manga or comic. Works with raw raws, scanlation pages, and phone camera shots.",
-  },
-  {
-    number: "02",
-    title: "OCR detects the text",
-    description:
-      "PaddleOCR — a state-of-the-art open-source engine — locates every speech bubble, thought box, and sound effect on the page and extracts the text with high precision.",
-  },
-  {
-    number: "03",
-    title: "AI translates in context",
-    description:
-      "A large language model receives the extracted text along with positional context so it understands reading order and narrative flow, producing natural translations instead of robotic word-for-word output.",
-  },
-  {
-    number: "04",
-    title: "Rendered back onto the panel",
-    description:
-      "The translated text is composited back over the original bubbles, giving you a clean, readable page — no copy-pasting required.",
-  },
+const STEP_KEYS = [
+  { number: "01", titleKey: "about.step1.title", descKey: "about.step1.description" },
+  { number: "02", titleKey: "about.step2.title", descKey: "about.step2.description" },
+  { number: "03", titleKey: "about.step3.title", descKey: "about.step3.description" },
+  { number: "04", titleKey: "about.step4.title", descKey: "about.step4.description" },
 ];
 
-const techStack = [
-  { label: "OCR engine", value: "PaddleOCR (PP-OCRv4)" },
-  { label: "Translation", value: "LLM with manga-aware prompting" },
-  { label: "Framework", value: "Next.js 16 App Router" },
-  { label: "Styling", value: "Tailwind CSS v4" },
-  { label: "Hosting", value: "Vercel Edge Network" },
-  { label: "Image processing", value: "Sharp" },
+const TECH_STACK_KEYS = [
+  { labelKey: "about.tech.ocr", value: "PaddleOCR (PP-OCRv4)" },
+  { labelKey: "about.tech.translation", value: "LLM with manga-aware prompting" },
+  { labelKey: "about.tech.framework", value: "Next.js 16 App Router" },
+  { labelKey: "about.tech.styling", value: "Tailwind CSS v4" },
+  { labelKey: "about.tech.hosting", value: "Vercel Edge Network" },
+  { labelKey: "about.tech.imageProcessing", value: "Sharp" },
 ];
 
 export default function AboutPage() {
+  const t = useT();
+
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
@@ -50,29 +28,26 @@ export default function AboutPage() {
         {/* Hero */}
         <div className="mb-14 text-center">
           <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">
-            About the project
+            {t("about.subtitle")}
           </p>
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-            Built for manga fans,
+            {t("about.title1")}
             <br />
-            by manga fans.
+            {t("about.title2")}
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-            CartoonTranslator started as a weekend experiment to scratch a
-            personal itch: reading untranslated manga chapters the same day they
-            drop in Japan. It grew into a proper tool — and now it&apos;s free
-            for everyone.
+            {t("about.intro")}
           </p>
         </div>
 
         {/* How it works */}
         <section className="mb-14">
           <h2 className="mb-6 text-2xl font-bold tracking-tight text-foreground">
-            How it works
+            {t("about.howItWorks.title")}
           </h2>
 
           <div className="space-y-4">
-            {steps.map((step) => (
+            {STEP_KEYS.map((step) => (
               <div
                 key={step.number}
                 className="flex gap-5 rounded-2xl bg-card px-6 py-5 ring-1 ring-foreground/10 shadow-sm"
@@ -81,9 +56,9 @@ export default function AboutPage() {
                   {step.number}
                 </span>
                 <div>
-                  <p className="font-semibold text-foreground">{step.title}</p>
+                  <p className="font-semibold text-foreground">{t(step.titleKey)}</p>
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                    {step.description}
+                    {t(step.descKey)}
                   </p>
                 </div>
               </div>
@@ -94,21 +69,21 @@ export default function AboutPage() {
         {/* Tech stack */}
         <section className="mb-14">
           <h2 className="mb-6 text-2xl font-bold tracking-tight text-foreground">
-            Tech stack
+            {t("about.techStack.title")}
           </h2>
 
           <div className="rounded-2xl bg-card ring-1 ring-foreground/10 shadow-sm overflow-hidden">
-            {techStack.map((item, index) => (
+            {TECH_STACK_KEYS.map((item, index) => (
               <div
-                key={item.label}
+                key={item.labelKey}
                 className={`flex items-center justify-between px-6 py-4 text-sm ${
-                  index < techStack.length - 1
+                  index < TECH_STACK_KEYS.length - 1
                     ? "border-b border-border"
                     : ""
                 }`}
               >
                 <span className="font-medium text-muted-foreground">
-                  {item.label}
+                  {t(item.labelKey)}
                 </span>
                 <span className="font-semibold text-foreground">
                   {item.value}
@@ -121,44 +96,29 @@ export default function AboutPage() {
         {/* Philosophy */}
         <section className="mb-14">
           <h2 className="mb-6 text-2xl font-bold tracking-tight text-foreground">
-            Philosophy
+            {t("about.philosophy.title")}
           </h2>
 
           <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
-            <p>
-              Professional localisation is an art form — it takes talented
-              translators, letterers, and editors months of work per volume.
-              CartoonTranslator is not a replacement for that; it&apos;s a
-              reading aid for fans who want to follow ongoing series or explore
-              titles that may never receive an official release.
-            </p>
-            <p>
-              We believe tools like this should be free, fast, and
-              privacy-respecting. Your images are never stored beyond the
-              lifetime of a request, no account is required, and the code is
-              open source.
-            </p>
-            <p>
-              If you enjoy the project, consider supporting the official English
-              releases of the manga you love — your purchases fund the creators
-              who make this art possible.
-            </p>
+            <p>{t("about.philosophy.p1")}</p>
+            <p>{t("about.philosophy.p2")}</p>
+            <p>{t("about.philosophy.p3")}</p>
           </div>
         </section>
 
         {/* CTA */}
         <div className="flex flex-col items-center gap-4 rounded-2xl bg-card px-6 py-10 text-center ring-1 ring-foreground/10 shadow-sm sm:flex-row sm:justify-between sm:text-left">
           <div>
-            <p className="font-semibold text-foreground">Ready to translate?</p>
+            <p className="font-semibold text-foreground">{t("about.cta.title")}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              No sign-up required. Just drop in a page.
+              {t("about.cta.subtitle")}
             </p>
           </div>
           <a
             href="/translate"
             className="inline-block flex-shrink-0 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity"
           >
-            Try it free
+            {t("about.cta.button")}
           </a>
         </div>
       </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useCallback, useEffect } from "react"
+import { useT } from "@/lib/i18n/TranslationContext"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
@@ -133,6 +134,7 @@ function saveHistory(items: HistoryItem[]) {
 const LOCALE_STORAGE_KEY = "ct_target_lang"
 
 export default function TranslatePage() {
+  const t = useT()
   const [pages, setPages] = useState<PageResult[]>([])
   const [sourceLanguage, setSourceLanguage] = useState("auto")
   const [targetLanguage, setTargetLanguage] = useState("en")
@@ -432,29 +434,29 @@ export default function TranslatePage() {
       <div className="w-full max-w-4xl space-y-6">
         <div className="text-center space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Manga &amp; Comic Translator
+            {t("translate.title")}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Upload up to {MAX_FILES} pages, choose languages, and get translated results.
+            {t("translate.subtitle", { max: String(MAX_FILES) })}
           </p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="upload">Upload</TabsTrigger>
+            <TabsTrigger value="upload">{t("translate.tab.upload")}</TabsTrigger>
             <TabsTrigger value="result" disabled={!hasResults && !isProcessing}>
-              Results
+              {t("translate.tab.results")}
             </TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
+            <TabsTrigger value="history">{t("translate.tab.history")}</TabsTrigger>
           </TabsList>
 
           {/* ===== UPLOAD TAB ===== */}
           <TabsContent value="upload" className="space-y-6 mt-4">
             <Card>
               <CardHeader>
-                <CardTitle>Upload Images</CardTitle>
+                <CardTitle>{t("translate.upload.title")}</CardTitle>
                 <CardDescription>
-                  JPG, PNG, or WEBP &mdash; max 10 MB each &mdash; up to {MAX_FILES} pages
+                  {t("translate.upload.description", { max: String(MAX_FILES) })}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -482,10 +484,10 @@ export default function TranslatePage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-foreground">
-                      Drag &amp; drop your images here
+                      {t("translate.upload.dropzone.title")}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      or click to browse &mdash; select multiple files at once
+                      {t("translate.upload.dropzone.subtitle")}
                     </p>
                   </div>
                   <Button
@@ -498,7 +500,7 @@ export default function TranslatePage() {
                     }}
                   >
                     <ImageIcon className="size-4" />
-                    Choose files
+                    {t("translate.upload.chooseFiles")}
                   </Button>
                 </div>
 
@@ -522,11 +524,13 @@ export default function TranslatePage() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-medium text-foreground">
-                        {pages.length} page{pages.length !== 1 ? "s" : ""} uploaded
+                        {pages.length !== 1
+                          ? t("translate.upload.pagesUploadedPlural", { count: String(pages.length) })
+                          : t("translate.upload.pagesUploaded", { count: String(pages.length) })}
                       </p>
                       <Button variant="ghost" size="sm" onClick={handleReset}>
                         <Trash2 className="size-4" />
-                        Clear all
+                        {t("translate.upload.clearAll")}
                       </Button>
                     </div>
                     <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
@@ -559,15 +563,15 @@ export default function TranslatePage() {
             {/* Language selection */}
             <Card>
               <CardHeader>
-                <CardTitle>Languages</CardTitle>
+                <CardTitle>{t("translate.languages.title")}</CardTitle>
                 <CardDescription>
-                  {TARGET_LANGUAGES.length}+ target languages supported
+                  {t("translate.languages.description", { count: String(TARGET_LANGUAGES.length) })}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="source-language">Source language</Label>
+                    <Label htmlFor="source-language">{t("translate.languages.source")}</Label>
                     <Select value={sourceLanguage} onValueChange={(val) => val && setSourceLanguage(val)}>
                       <SelectTrigger id="source-language" className="w-full">
                         <SelectValue />
@@ -582,7 +586,7 @@ export default function TranslatePage() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="target-language">Target language</Label>
+                    <Label htmlFor="target-language">{t("translate.languages.target")}</Label>
                     <Select value={targetLanguage} onValueChange={(val) => val && setTargetLanguage(val)}>
                       <SelectTrigger id="target-language" className="w-full">
                         <SelectValue />
@@ -609,10 +613,16 @@ export default function TranslatePage() {
               {isProcessing ? (
                 <>
                   <Loader2 className="animate-spin" />
-                  Translating {pages.length} page{pages.length !== 1 ? "s" : ""}&hellip;
+                  {pages.length !== 1
+                    ? t("translate.button.translatingPlural", { count: String(pages.length) })
+                    : t("translate.button.translating", { count: String(pages.length) })}
                 </>
+              ) : pages.length > 0 ? (
+                pages.length !== 1
+                  ? t("translate.button.translatePlural", { count: String(pages.length) })
+                  : t("translate.button.translate", { count: String(pages.length) })
               ) : (
-                `Translate ${pages.length > 0 ? pages.length : ""} Page${pages.length !== 1 ? "s" : ""}`
+                t("translate.button.translateEmpty")
               )}
             </Button>
 
@@ -620,7 +630,7 @@ export default function TranslatePage() {
               <div className="space-y-1">
                 <Progress value={overallProgress} />
                 <p className="text-xs text-muted-foreground text-center">
-                  {overallProgress}% complete
+                  {t("translate.progress.complete", { pct: String(overallProgress) })}
                 </p>
               </div>
             )}
@@ -659,7 +669,7 @@ export default function TranslatePage() {
                       }
                     >
                       <Columns2 className="size-4" />
-                      {viewMode === "single" ? "Side by Side" : "Single View"}
+                      {viewMode === "single" ? t("translate.result.viewSideBySide") : t("translate.result.viewSingle")}
                     </Button>
                     {currentPage?.result?.imageUrl && (
                       <Button
@@ -668,13 +678,13 @@ export default function TranslatePage() {
                         onClick={() => handleDownload(activePageIndex)}
                       >
                         <Download className="size-4" />
-                        Download
+                        {t("translate.result.download")}
                       </Button>
                     )}
                     {pages.filter((p) => p.result?.imageUrl).length > 1 && (
                       <Button variant="outline" size="sm" onClick={handleDownloadAll}>
                         <Download className="size-4" />
-                        All
+                        {t("translate.result.downloadAll")}
                       </Button>
                     )}
                   </div>
@@ -686,7 +696,7 @@ export default function TranslatePage() {
                     <CardContent className="flex items-center justify-center py-16">
                       <Loader2 className="animate-spin size-8 text-primary" />
                       <span className="ml-3 text-muted-foreground">
-                        Processing page {activePageIndex + 1}...
+                        {t("translate.result.processing", { page: String(activePageIndex + 1) })}
                       </span>
                     </CardContent>
                   </Card>
@@ -698,8 +708,8 @@ export default function TranslatePage() {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         {currentPage.result.success
-                          ? `Page ${activePageIndex + 1} — Translated`
-                          : `Page ${activePageIndex + 1} — Failed`}
+                          ? t("translate.result.pageSuccess", { page: String(activePageIndex + 1) })
+                          : t("translate.result.pageFailed", { page: String(activePageIndex + 1) })}
                       </CardTitle>
                       <CardDescription>{currentPage.result.message}</CardDescription>
                     </CardHeader>
@@ -711,7 +721,7 @@ export default function TranslatePage() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <p className="text-xs font-medium text-muted-foreground text-center">
-                                Original
+                                {t("translate.result.original")}
                               </p>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
@@ -723,7 +733,7 @@ export default function TranslatePage() {
                             {currentPage.result.imageUrl && (
                               <div className="space-y-2">
                                 <p className="text-xs font-medium text-muted-foreground text-center">
-                                  Translated
+                                  {t("translate.result.translated")}
                                 </p>
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
@@ -755,7 +765,7 @@ export default function TranslatePage() {
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <h3 className="text-sm font-semibold text-foreground">
-                              Translation Details (editable)
+                              {t("translate.result.editDetails")}
                             </h3>
                             <Button
                               variant="outline"
@@ -768,7 +778,7 @@ export default function TranslatePage() {
                               ) : (
                                 <RefreshCw className="size-3.5" />
                               )}
-                              Re-render
+                              {t("translate.result.rerender")}
                             </Button>
                           </div>
                           <div className="space-y-2">
@@ -792,7 +802,7 @@ export default function TranslatePage() {
                             ))}
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            Edit the translations above, then click &quot;Re-render&quot; to update the image.
+                            {t("translate.result.editHint")}
                           </p>
                         </div>
                       </CardContent>
@@ -802,7 +812,7 @@ export default function TranslatePage() {
 
                 <Button onClick={handleReset} variant="outline" className="w-full">
                   <RotateCcw className="size-4" />
-                  Start Over
+                  {t("translate.result.startOver")}
                 </Button>
 
               </>
@@ -816,12 +826,12 @@ export default function TranslatePage() {
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
                     <Clock className="size-5" />
-                    Translation History
+                    {t("translate.history.title")}
                   </CardTitle>
                   {history.length > 0 && (
                     <Button variant="ghost" size="sm" onClick={clearHistory}>
                       <Trash2 className="size-4" />
-                      Clear
+                      {t("translate.history.clear")}
                     </Button>
                   )}
                 </div>
@@ -829,7 +839,7 @@ export default function TranslatePage() {
               <CardContent>
                 {history.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-8">
-                    No translation history yet. Translate some pages to see them here.
+                    {t("translate.history.empty")}
                   </p>
                 ) : (
                   <div className="space-y-2">

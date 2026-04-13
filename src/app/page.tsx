@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,386 +11,338 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AdBanner, AdSocialBar } from "@/components/adsterra-ad";
-
-// ─── Feature data ────────────────────────────────────────────────────────────
-
-const features = [
-  {
-    icon: "🈯",
-    title: "Japanese Vertical Text",
-    description:
-      "Full support for tategumi (vertical writing mode) found in traditional manga and light novels.",
-  },
-  {
-    icon: "🌐",
-    title: "35+ Languages",
-    description:
-      "Translate between Japanese, Korean, Chinese, English, Spanish, French, German, and many more.",
-  },
-  {
-    icon: "📚",
-    title: "Batch Upload",
-    description:
-      "Process up to 50 pages at once with Pro. Upload a chapter and let the AI handle everything.",
-  },
-  {
-    icon: "🎨",
-    title: "Smart Text Replacement",
-    description:
-      "AI detects speech bubble colors and naturally replaces text — not just white boxes over your manga.",
-  },
-  {
-    icon: "✏️",
-    title: "Edit & Re-render",
-    description:
-      "Review, tweak, and re-render every translation bubble before exporting. Full creative control.",
-  },
-  {
-    icon: "🔍",
-    title: "Side-by-Side Comparison",
-    description:
-      "View the original and translated pages together to verify accuracy at a glance.",
-  },
-];
-
-// ─── Steps data ───────────────────────────────────────────────────────────────
-
-const steps = [
-  {
-    number: "01",
-    icon: "⬆️",
-    title: "Upload",
-    description: "Drop your manga page image — JPG, PNG, or WebP up to 10 MB.",
-  },
-  {
-    number: "02",
-    icon: "🤖",
-    title: "AI Processes",
-    description:
-      "OCR detects every text bubble, AI translates, then smart inpainting replaces the original text.",
-  },
-  {
-    number: "03",
-    icon: "⬇️",
-    title: "Download",
-    description:
-      "Get your translated page instantly with natural typography matching the speech bubble style.",
-  },
-];
-
-// ─── Stats data ───────────────────────────────────────────────────────────────
-
-const stats = [
-  { value: "50", label: "Pages per batch (Pro)" },
-  { value: "35+", label: "Languages supported" },
-  { value: "Free", label: "5 pages/day free" },
-  { value: "95%+", label: "CJK OCR accuracy" },
-];
+import { useT } from "@/lib/i18n/TranslationContext";
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Home() {
+  const t = useT();
+
+  const features = [
+    {
+      icon: "🈯",
+      titleKey: "home.features.f1.title",
+      descKey: "home.features.f1.description",
+    },
+    {
+      icon: "🌐",
+      titleKey: "home.features.f2.title",
+      descKey: "home.features.f2.description",
+    },
+    {
+      icon: "📚",
+      titleKey: "home.features.f3.title",
+      descKey: "home.features.f3.description",
+    },
+    {
+      icon: "🎨",
+      titleKey: "home.features.f4.title",
+      descKey: "home.features.f4.description",
+    },
+    {
+      icon: "✏️",
+      titleKey: "home.features.f5.title",
+      descKey: "home.features.f5.description",
+    },
+    {
+      icon: "🔍",
+      titleKey: "home.features.f6.title",
+      descKey: "home.features.f6.description",
+    },
+  ];
+
+  const steps = [
+    {
+      number: "01",
+      icon: "⬆️",
+      titleKey: "home.howItWorks.step1.title",
+      descKey: "home.howItWorks.step1.description",
+    },
+    {
+      number: "02",
+      icon: "🤖",
+      titleKey: "home.howItWorks.step2.title",
+      descKey: "home.howItWorks.step2.description",
+    },
+    {
+      number: "03",
+      icon: "⬇️",
+      titleKey: "home.howItWorks.step3.title",
+      descKey: "home.howItWorks.step3.description",
+    },
+  ];
+
+  const stats = [
+    { value: "50", labelKey: "home.stats.s1.label" },
+    { value: "35+", labelKey: "home.stats.s2.label" },
+    { value: "Free", labelKey: "home.stats.s3.label" },
+    { value: "95%+", labelKey: "home.stats.s4.label" },
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-background font-sans">
 
-      {/* ── Nav ──────────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xl" aria-hidden="true">📖</span>
-            <span className="font-heading font-semibold text-base tracking-tight text-foreground">
-              CartoonTranslator
-            </span>
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden pt-20 pb-16 sm:pt-28 sm:pb-24">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 -top-24 flex justify-center"
+        >
+          <div className="h-[500px] w-[900px] rounded-full bg-indigo-400/10 blur-3xl" />
+        </div>
+
+        <div className="relative mx-auto max-w-6xl px-6 text-center">
+          <div className="mb-6 flex justify-center">
+            <Badge variant="outline" className="gap-1.5 rounded-full px-3 py-1 text-xs font-medium border-indigo-200 text-indigo-600">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+              {t("home.hero.badge")}
+            </Badge>
           </div>
-          <nav className="flex items-center gap-3">
-            <Link
-              href="#how-it-works"
-              className="hidden sm:block text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              How it works
-            </Link>
-            <Link
-              href="#features"
-              className="hidden sm:block text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Features
-            </Link>
+
+          <h1 className="mx-auto max-w-3xl text-4xl font-heading font-semibold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+            {t("home.hero.title1")}{" "}
+            <span className="text-indigo-600">{t("home.hero.title2")}</span>
+          </h1>
+
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+            {t("home.hero.description")}
+          </p>
+
+          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link href="/translate">
-              <Button size="sm" className="rounded-full px-4">
-                Start Translating
+              <Button
+                size="lg"
+                className="h-11 rounded-full bg-indigo-600 px-8 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors shadow-md shadow-indigo-200"
+              >
+                {t("home.hero.ctaStart")}
               </Button>
             </Link>
-          </nav>
-        </div>
-      </header>
-
-      <main className="flex-1">
-
-        {/* ── Hero ─────────────────────────────────────────────────────────── */}
-        <section className="relative overflow-hidden pt-20 pb-16 sm:pt-28 sm:pb-24">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 -top-24 flex justify-center"
-          >
-            <div className="h-[500px] w-[900px] rounded-full bg-indigo-400/10 blur-3xl" />
+            <Link href="#how-it-works">
+              <Button
+                variant="outline"
+                size="lg"
+                className="h-11 rounded-full px-8 text-sm font-medium"
+              >
+                {t("home.hero.ctaHow")}
+              </Button>
+            </Link>
           </div>
 
-          <div className="relative mx-auto max-w-6xl px-6 text-center">
-            <div className="mb-6 flex justify-center">
-              <Badge variant="outline" className="gap-1.5 rounded-full px-3 py-1 text-xs font-medium border-indigo-200 text-indigo-600">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
-                AI-Powered Smart Translation
-              </Badge>
-            </div>
+          {/* Mock preview */}
+          <div className="mt-16 mx-auto max-w-4xl">
+            <div className="rounded-2xl ring-1 ring-border shadow-xl shadow-foreground/5 overflow-hidden bg-card">
+              <div className="flex items-center gap-1.5 border-b border-border bg-muted/40 px-4 py-3">
+                <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
+                <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
+                <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
+                <span className="ml-3 text-xs text-muted-foreground">
+                  {t("home.hero.previewLabel")}
+                </span>
+              </div>
 
-            <h1 className="mx-auto max-w-3xl text-4xl font-heading font-semibold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Translate Any Manga or{" "}
-              <span className="text-indigo-600">Comic Instantly</span>
-            </h1>
-
-            <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              AI-powered OCR detects dialogue, translates it, and naturally replaces
-              text in speech bubbles — matching the original style. Supports 35+
-              languages including Japanese, Korean, and Chinese.
-            </p>
-
-            <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-              <Link href="/translate">
-                <Button
-                  size="lg"
-                  className="h-11 rounded-full bg-indigo-600 px-8 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors shadow-md shadow-indigo-200"
-                >
-                  Start Translating Free
-                </Button>
-              </Link>
-              <Link href="#how-it-works">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="h-11 rounded-full px-8 text-sm font-medium"
-                >
-                  See how it works
-                </Button>
-              </Link>
-            </div>
-
-            {/* Mock preview */}
-            <div className="mt-16 mx-auto max-w-4xl">
-              <div className="rounded-2xl ring-1 ring-border shadow-xl shadow-foreground/5 overflow-hidden bg-card">
-                <div className="flex items-center gap-1.5 border-b border-border bg-muted/40 px-4 py-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
-                  <span className="ml-3 text-xs text-muted-foreground">
-                    cartoonTranslator — translate
+              <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border">
+                <div className="relative flex flex-col items-center justify-center gap-4 bg-muted/20 p-8 min-h-[240px]">
+                  <span className="absolute top-3 left-3">
+                    <Badge variant="secondary" className="text-[10px] tracking-wide uppercase">{t("home.hero.original")}</Badge>
                   </span>
+                  <div className="w-full max-w-[180px] space-y-3 opacity-70">
+                    <div className="h-24 rounded-lg bg-muted animate-pulse" />
+                    <div className="mx-auto h-5 w-3/4 rounded bg-muted animate-pulse" />
+                    <div className="mx-auto h-5 w-1/2 rounded bg-muted animate-pulse" />
+                  </div>
+                  <div className="rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium shadow-sm">
+                    なるほど！すごい！
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border">
-                  <div className="relative flex flex-col items-center justify-center gap-4 bg-muted/20 p-8 min-h-[240px]">
-                    <span className="absolute top-3 left-3">
-                      <Badge variant="secondary" className="text-[10px] tracking-wide uppercase">Original</Badge>
-                    </span>
-                    <div className="w-full max-w-[180px] space-y-3 opacity-70">
-                      <div className="h-24 rounded-lg bg-muted animate-pulse" />
-                      <div className="mx-auto h-5 w-3/4 rounded bg-muted animate-pulse" />
-                      <div className="mx-auto h-5 w-1/2 rounded bg-muted animate-pulse" />
-                    </div>
-                    <div className="rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium shadow-sm">
-                      なるほど！すごい！
-                    </div>
+                <div className="relative flex flex-col items-center justify-center gap-4 bg-indigo-50/40 p-8 min-h-[240px]">
+                  <span className="absolute top-3 left-3">
+                    <Badge className="text-[10px] tracking-wide uppercase bg-indigo-600">{t("home.hero.translated")}</Badge>
+                  </span>
+                  <div className="w-full max-w-[180px] space-y-3 opacity-70">
+                    <div className="h-24 rounded-lg bg-indigo-100 animate-pulse" />
+                    <div className="mx-auto h-5 w-3/4 rounded bg-indigo-100 animate-pulse" />
+                    <div className="mx-auto h-5 w-1/2 rounded bg-indigo-100 animate-pulse" />
                   </div>
-
-                  <div className="relative flex flex-col items-center justify-center gap-4 bg-indigo-50/40 p-8 min-h-[240px]">
-                    <span className="absolute top-3 left-3">
-                      <Badge className="text-[10px] tracking-wide uppercase bg-indigo-600">Translated</Badge>
-                    </span>
-                    <div className="w-full max-w-[180px] space-y-3 opacity-70">
-                      <div className="h-24 rounded-lg bg-indigo-100 animate-pulse" />
-                      <div className="mx-auto h-5 w-3/4 rounded bg-indigo-100 animate-pulse" />
-                      <div className="mx-auto h-5 w-1/2 rounded bg-indigo-100 animate-pulse" />
-                    </div>
-                    <div className="rounded-xl border border-indigo-200 bg-card px-4 py-2 text-sm font-medium shadow-sm text-indigo-700">
-                      I see! Amazing!
-                    </div>
+                  <div className="rounded-xl border border-indigo-200 bg-card px-4 py-2 text-sm font-medium shadow-sm text-indigo-700">
+                    I see! Amazing!
                   </div>
                 </div>
               </div>
-              <p className="mt-3 text-center text-xs text-muted-foreground">
-                Before &amp; after — smart text replacement preview
-              </p>
             </div>
-          </div>
-        </section>
-
-        {/* ── How It Works ─────────────────────────────────────────────────── */}
-        <section id="how-it-works" className="py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl px-6">
-            <div className="text-center mb-14">
-              <Badge variant="outline" className="mb-4 rounded-full border-indigo-200 text-indigo-600">
-                Simple workflow
-              </Badge>
-              <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                How It Works
-              </h2>
-              <p className="mt-3 text-muted-foreground">
-                From raw scan to translated page in seconds — no setup required.
-              </p>
-            </div>
-
-            <div className="relative grid gap-6 sm:grid-cols-3">
-              <div
-                aria-hidden="true"
-                className="absolute top-12 left-[calc(16.66%+1rem)] right-[calc(16.66%+1rem)] hidden h-px bg-gradient-to-r from-indigo-200 via-indigo-300 to-indigo-200 sm:block"
-              />
-
-              {steps.map((step) => (
-                <Card
-                  key={step.number}
-                  className="relative flex flex-col items-center text-center rounded-2xl shadow-sm bg-card border-0"
-                >
-                  <CardHeader className="w-full items-center pb-0">
-                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white shadow-md shadow-indigo-200">
-                      {step.number}
-                    </div>
-                    <div className="mb-1 text-3xl" aria-hidden="true">
-                      {step.icon}
-                    </div>
-                    <CardTitle className="text-base font-semibold">
-                      {step.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-1">
-                    <CardDescription className="text-sm leading-relaxed">
-                      {step.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Ad Banner ──────────────────────────────────────────────────── */}
-        <div className="flex justify-center py-4">
-          <AdBanner />
-        </div>
-
-        {/* ── Features ─────────────────────────────────────────────────────── */}
-        <section id="features" className="py-20 sm:py-28 bg-muted/30">
-          <div className="mx-auto max-w-6xl px-6">
-            <div className="text-center mb-14">
-              <Badge variant="outline" className="mb-4 rounded-full border-indigo-200 text-indigo-600">
-                Everything you need
-              </Badge>
-              <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                Built for Manga Readers
-              </h2>
-              <p className="mt-3 text-muted-foreground">
-                Powerful features that handle the quirks of comic and manga translation.
-              </p>
-            </div>
-
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {features.map((feature) => (
-                <Card
-                  key={feature.title}
-                  className="rounded-2xl shadow-sm bg-card border-0 transition-shadow hover:shadow-md"
-                >
-                  <CardHeader>
-                    <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-2xl ring-1 ring-indigo-100">
-                      {feature.icon}
-                    </div>
-                    <CardTitle className="text-sm font-semibold">
-                      {feature.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <CardDescription className="text-sm leading-relaxed">
-                      {feature.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Stats ────────────────────────────────────────────────────────── */}
-        <section className="py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl px-6">
-            <div className="text-center mb-14">
-              <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                Trusted by Manga Fans Worldwide
-              </h2>
-              <p className="mt-3 text-muted-foreground">
-                Numbers that speak for themselves.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-5 sm:grid-cols-4">
-              {stats.map((stat) => (
-                <Card
-                  key={stat.label}
-                  className="rounded-2xl shadow-sm bg-card border-0 text-center"
-                >
-                  <CardContent className="py-6">
-                    <p className="font-heading text-4xl font-bold text-indigo-600">
-                      {stat.value}
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {stat.label}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Final CTA ────────────────────────────────────────────────────── */}
-        <section className="py-20 sm:py-28">
-          <div className="mx-auto max-w-3xl px-6 text-center">
-            <div className="mb-5 text-5xl" aria-hidden="true">📖✨</div>
-
-            <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Ready to translate your favorite manga?
-            </h2>
-            <p className="mt-4 text-muted-foreground sm:text-lg leading-relaxed">
-              No account required. Just upload a page and get a natural-looking
-              translation in seconds — completely free.
+            <p className="mt-3 text-center text-xs text-muted-foreground">
+              {t("home.hero.previewCaption")}
             </p>
-
-            <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-              <Link href="/translate">
-                <Button
-                  size="lg"
-                  className="h-11 rounded-full bg-indigo-600 px-10 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors shadow-md shadow-indigo-200"
-                >
-                  Start Translating Free
-                </Button>
-              </Link>
-              <p className="text-xs text-muted-foreground">
-                No credit card &bull; No sign-up required
-              </p>
-            </div>
-
-            {/* Language chips */}
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
-              {[
-                "🇯🇵 Japanese", "🇰🇷 Korean", "🇨🇳 Chinese", "🇺🇸 English",
-                "🇪🇸 Spanish", "🇫🇷 French", "🇩🇪 German", "🇧🇷 Portuguese",
-                "🇮🇹 Italian", "🇷🇺 Russian", "🇹🇭 Thai", "🇻🇳 Vietnamese",
-                "+ 23 more",
-              ].map((lang) => (
-                <Badge key={lang} variant="secondary" className="rounded-full px-3 py-1 text-xs">
-                  {lang}
-                </Badge>
-              ))}
-            </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
+
+      {/* ── How It Works ─────────────────────────────────────────────────── */}
+      <section id="how-it-works" className="py-20 sm:py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="text-center mb-14">
+            <Badge variant="outline" className="mb-4 rounded-full border-indigo-200 text-indigo-600">
+              {t("home.howItWorks.badge")}
+            </Badge>
+            <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+              {t("home.howItWorks.title")}
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              {t("home.howItWorks.subtitle")}
+            </p>
+          </div>
+
+          <div className="relative grid gap-6 sm:grid-cols-3">
+            <div
+              aria-hidden="true"
+              className="absolute top-12 left-[calc(16.66%+1rem)] right-[calc(16.66%+1rem)] hidden h-px bg-gradient-to-r from-indigo-200 via-indigo-300 to-indigo-200 sm:block"
+            />
+
+            {steps.map((step) => (
+              <Card
+                key={step.number}
+                className="relative flex flex-col items-center text-center rounded-2xl shadow-sm bg-card border-0"
+              >
+                <CardHeader className="w-full items-center pb-0">
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white shadow-md shadow-indigo-200">
+                    {step.number}
+                  </div>
+                  <div className="mb-1 text-3xl" aria-hidden="true">
+                    {step.icon}
+                  </div>
+                  <CardTitle className="text-base font-semibold">
+                    {t(step.titleKey)}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-1">
+                  <CardDescription className="text-sm leading-relaxed">
+                    {t(step.descKey)}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Ad Banner ──────────────────────────────────────────────────── */}
+      <div className="flex justify-center py-4">
+        <AdBanner />
+      </div>
+
+      {/* ── Features ─────────────────────────────────────────────────────── */}
+      <section id="features" className="py-20 sm:py-28 bg-muted/30">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="text-center mb-14">
+            <Badge variant="outline" className="mb-4 rounded-full border-indigo-200 text-indigo-600">
+              {t("home.features.badge")}
+            </Badge>
+            <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+              {t("home.features.title")}
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              {t("home.features.subtitle")}
+            </p>
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((feature) => (
+              <Card
+                key={feature.titleKey}
+                className="rounded-2xl shadow-sm bg-card border-0 transition-shadow hover:shadow-md"
+              >
+                <CardHeader>
+                  <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-2xl ring-1 ring-indigo-100">
+                    {feature.icon}
+                  </div>
+                  <CardTitle className="text-sm font-semibold">
+                    {t(feature.titleKey)}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <CardDescription className="text-sm leading-relaxed">
+                    {t(feature.descKey)}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Stats ────────────────────────────────────────────────────────── */}
+      <section className="py-20 sm:py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="text-center mb-14">
+            <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+              {t("home.stats.title")}
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              {t("home.stats.subtitle")}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-5 sm:grid-cols-4">
+            {stats.map((stat) => (
+              <Card
+                key={stat.labelKey}
+                className="rounded-2xl shadow-sm bg-card border-0 text-center"
+              >
+                <CardContent className="py-6">
+                  <p className="font-heading text-4xl font-bold text-indigo-600">
+                    {stat.value}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {t(stat.labelKey)}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Final CTA ────────────────────────────────────────────────────── */}
+      <section className="py-20 sm:py-28">
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          <div className="mb-5 text-5xl" aria-hidden="true">📖✨</div>
+
+          <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+            {t("home.cta.title")}
+          </h2>
+          <p className="mt-4 text-muted-foreground sm:text-lg leading-relaxed">
+            {t("home.cta.subtitle")}
+          </p>
+
+          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <Link href="/translate">
+              <Button
+                size="lg"
+                className="h-11 rounded-full bg-indigo-600 px-10 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors shadow-md shadow-indigo-200"
+              >
+                {t("home.cta.button")}
+              </Button>
+            </Link>
+            <p className="text-xs text-muted-foreground">
+              {t("home.cta.noSignup")}
+            </p>
+          </div>
+
+          {/* Language chips */}
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
+            {[
+              "🇯🇵 Japanese", "🇰🇷 Korean", "🇨🇳 Chinese", "🇺🇸 English",
+              "🇪🇸 Spanish", "🇫🇷 French", "🇩🇪 German", "🇧🇷 Portuguese",
+              "🇮🇹 Italian", "🇷🇺 Russian", "🇹🇭 Thai", "🇻🇳 Vietnamese",
+              "+ 23 more",
+            ].map((lang) => (
+              <Badge key={lang} variant="secondary" className="rounded-full px-3 py-1 text-xs">
+                {lang}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <AdSocialBar />
 
@@ -397,15 +351,15 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <span aria-hidden="true">📖</span>
-            <span className="font-medium text-foreground">CartoonTranslator</span>
+            <span className="font-medium text-foreground">{t("nav.appName")}</span>
           </div>
-          <p>© {new Date().getFullYear()} CartoonTranslator. Free to use.</p>
+          <p>&copy; {new Date().getFullYear()} {t("nav.appName")}. {t("footer.freeToUse")}</p>
           <div className="flex items-center gap-4">
             <Link href="/translate" className="hover:text-foreground transition-colors">
-              Translate
+              {t("nav.translate")}
             </Link>
             <Link href="#features" className="hover:text-foreground transition-colors">
-              Features
+              {t("home.features.title")}
             </Link>
           </div>
         </div>

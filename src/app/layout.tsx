@@ -7,6 +7,7 @@ import { Footer } from "@/components/footer";
 import { FeedbackWidget } from "@/components/feedback-widget";
 import { LocaleDetector } from "@/components/locale-detector";
 import { AdBanner, AdSocialBar } from "@/components/adsterra-ad";
+import { I18nProvider } from "@/lib/i18n/TranslationContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -180,15 +181,17 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <LocaleDetector />
-        <Navbar />
-        <div className="flex justify-center py-1">
-          <AdBanner />
-        </div>
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <FeedbackWidget />
-        <AdSocialBar />
+        <I18nProvider>
+          <LocaleDetector />
+          <Navbar />
+          <div className="flex justify-center py-1">
+            <AdBanner />
+          </div>
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <FeedbackWidget />
+          <AdSocialBar />
+        </I18nProvider>
       </body>
     </html>
   );

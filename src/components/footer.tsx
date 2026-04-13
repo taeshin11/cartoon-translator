@@ -1,8 +1,12 @@
+"use client"
+
 import Link from "next/link"
 import { Separator } from "@/components/ui/separator"
 import { VisitorCounter } from "@/components/visitor-counter"
+import { useT } from "@/lib/i18n/TranslationContext"
 
 export function Footer() {
+  const t = useT()
   const currentYear = new Date().getFullYear()
 
   return (
@@ -11,28 +15,28 @@ export function Footer() {
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
           {/* Brand */}
           <div className="flex flex-col items-center gap-1 sm:items-start">
-            <span className="font-semibold text-foreground">CartoonTranslator</span>
+            <span className="font-semibold text-foreground">{t("nav.appName")}</span>
             <span className="text-xs text-muted-foreground">
-              AI-powered manga &amp; comic translation
+              {t("footer.tagline")}
             </span>
           </div>
 
           {/* Links */}
           <nav className="flex items-center gap-4 text-sm text-muted-foreground">
             <Link href="/" className="hover:text-foreground transition-colors">
-              Home
+              {t("nav.home")}
             </Link>
             <Link href="/translate" className="hover:text-foreground transition-colors">
-              Translate
+              {t("nav.translate")}
             </Link>
             <Link href="/blog" className="hover:text-foreground transition-colors">
-              Blog
+              {t("nav.blog")}
             </Link>
             <Link href="/faq" className="hover:text-foreground transition-colors">
-              FAQ
+              {t("nav.faq")}
             </Link>
             <Link href="/about" className="hover:text-foreground transition-colors">
-              About
+              {t("nav.about")}
             </Link>
           </nav>
         </div>
@@ -42,7 +46,7 @@ export function Footer() {
         <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-between">
           {/* Copyright */}
           <p className="text-xs text-muted-foreground">
-            &copy; {currentYear} CartoonTranslator. All rights reserved.
+            &copy; {currentYear} {t("nav.appName")}. {t("footer.allRightsReserved")}
           </p>
 
           {/* Visitor counter */}
